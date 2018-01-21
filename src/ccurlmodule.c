@@ -132,30 +132,40 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
 
 static PyObject*
 Curl_pow(PyObject *args, PyObject **kwds){
-  printf("Doing pow");
   ccurl_pow_init();
   // ccurl_pow(trytes, minWeightMagnitude);
   ccurl_pow_finalize();
-  printf("Done pow");
   return Py_None;
 }
 
 static PyObject*
-Curl_pearl_diver(PyObject *args, PyObject **kwds){
+Curl_pearl_diver(Curl *self, PyObject *args, PyObject **kwds){
+  int length, number_of_threads, min_weight_magnitude;
   PyObject *incoming;
+  PearlDiver* pearl_diver;
 
-  int length, number_of_threads, min_weight_manitude;
-  static char *kwlist[] = {"trits", "length", "min_weight_manitudes", "number_of_threads", NULL};
+  static char *kwlist[] = {"trits", "length", "min_weight_magnitude", "number_of_threads", NULL};
 
     // Extract and validate parameters.
-  if (! PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &incoming))
+  if (! PyArg_ParseTuple(args, "Oiii", &incoming, &length, &number_of_threads, &min_weight_magnitude)){
+  // if (! PyArg_ParseTupleAndKeywords(args, kwds, "Oiii", kwlist, &incoming, &length, &min_weight_manitude, &number_of_threads)){
+    printf("something went wrong\n");
     return NULL;
+  }
 
-  printf("diving...");
-  
+  // Segmentation faulty
+  if (! PyList_Check(incoming)) {
+    PyErr_SetString(PyExc_TypeError, "`trits` argument must be a list.");
+    return NULL;
+  }
+
   // ctx: PearlDiver struct (see: https://github.com/iotaledger/ccurl/blob/5bd644a8b5a2e7827115c2e43bf2eb8032f7935a/src/lib/pearl_diver.h)
   // thus, something like:
-  // pd_search(&ctx, transactionTrits, length, min_weight_magnitude, number_of_threads);
+  // /pd_search(&ctx, transactionTrits, length, min_weight_magnitude, number_of_threads);
+  // testing: https://github.com/iotaledger/ccurl/blob/d6995a70255b6c225e2ba4506c78d4d13876cfc0/test/test_pearldiver.c
+  // pd_search(&pearl_diver, &incoming, length, min_weight_magnitude, number_of_threads);
+  // Py_INCREF(Py_None);
+
   return Py_None;
 }
 
@@ -163,6 +173,7 @@ static PyObject*
 Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 {
   int i, incoming_count;
+  PyObject *incoming;
 
   static char *kwlist[] = {"trits", NULL};
 
@@ -205,12 +216,20 @@ Curl_reset(Curl *self)
   return Py_None;
 }
 
+static PyObject*
+dummy(Curl *self){
+  printf("XX\n");
+   return Py_None;
+}
+
 static PyMethodDef Curl_methods[] = {
   {"absorb", (PyCFunction)Curl_absorb, METH_VARARGS|METH_KEYWORDS, "Absorb trits into the sponge."},
   {"reset", (PyCFunction)Curl_reset, METH_NOARGS, "Resets internal state."},
   {"squeeze", (PyCFunction)Curl_squeeze, METH_VARARGS|METH_KEYWORDS, "Squeeze trits from the sponge."},
   {"local_pow", (PyCFunction)Curl_pow, METH_NOARGS, "XXX."},
-  {"pearl_diver", (PyCFunction)Curl_pearl_diver, METH_VARARGS|METH_KEYWORDS, "XXX."},
+  // {"pearl_diver", (PyCFunction)Curl_pearl_diver, METH_VARARGS|METH_KEYWORDS, "XXX."},
+  {"pearl_diver", (PyCFunction)Curl_pearl_diver, METH_VARARGS, "XXX."},
+  {"dummy", (PyCFunction)dummy, METH_VARARGS|METH_KEYWORDS, "XXX."},
   {NULL} /* Sentinel */
 };
 
