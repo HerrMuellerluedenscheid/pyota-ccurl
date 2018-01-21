@@ -1,5 +1,8 @@
 #include <Python.h>
 #include <stdint.h>
+#include <ccurl/ccurl.h>
+#include <ccurl/pearl_diver.h>
+// #include "/usr/include/ccurl/ccurl.h"
 
 #define HASH_LENGTH 243
 #define NUMBER_OF_ROUNDS 81
@@ -26,7 +29,7 @@
 // For consistency with the Curl c library, each trit gets 64 bits.
 // In future versions of the software, this will yield significant
 // speedups because we can compute multiple hashes concurrently.
-typedef int64_t trit_t;
+// typedef int64_t trit_t;
 
 // Copied from https://github.com/iotaledger/ccurl/blob/master/src/lib/Curl.c
 #define __TRUTH_TABLE	\
@@ -128,9 +131,37 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
 }
 
 static PyObject*
+Curl_pow(PyObject *args, PyObject **kwds){
+  printf("Doing pow");
+  ccurl_pow_init();
+  // ccurl_pow(trytes, minWeightMagnitude);
+  ccurl_pow_finalize();
+  printf("Done pow");
+  return Py_None;
+}
+
+static PyObject*
+Curl_pearl_diver(PyObject *args, PyObject **kwds){
+  PyObject *incoming;
+
+  int length, number_of_threads, min_weight_manitude;
+  static char *kwlist[] = {"trits", "length", "min_weight_manitudes", "number_of_threads", NULL};
+
+    // Extract and validate parameters.
+  if (! PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &incoming))
+    return NULL;
+
+  printf("diving...");
+  
+  // ctx: PearlDiver struct (see: https://github.com/iotaledger/ccurl/blob/5bd644a8b5a2e7827115c2e43bf2eb8032f7935a/src/lib/pearl_diver.h)
+  // thus, something like:
+  // pd_search(&ctx, transactionTrits, length, min_weight_magnitude, number_of_threads);
+  return Py_None;
+}
+
+static PyObject*
 Curl_squeeze(Curl *self, PyObject *args, PyObject *kwds)
 {
-  PyObject *incoming;
   int i, incoming_count;
 
   static char *kwlist[] = {"trits", NULL};
@@ -178,6 +209,8 @@ static PyMethodDef Curl_methods[] = {
   {"absorb", (PyCFunction)Curl_absorb, METH_VARARGS|METH_KEYWORDS, "Absorb trits into the sponge."},
   {"reset", (PyCFunction)Curl_reset, METH_NOARGS, "Resets internal state."},
   {"squeeze", (PyCFunction)Curl_squeeze, METH_VARARGS|METH_KEYWORDS, "Squeeze trits from the sponge."},
+  {"local_pow", (PyCFunction)Curl_pow, METH_NOARGS, "XXX."},
+  {"pearl_diver", (PyCFunction)Curl_pearl_diver, METH_VARARGS|METH_KEYWORDS, "XXX."},
   {NULL} /* Sentinel */
 };
 

@@ -13,3 +13,13 @@ class IsInstalledTestCase(TestCase):
     Verify that the C extension is installed correctly.
     """
     self.assertTrue(is_installed())
+
+  def test_pow(self):
+    """
+    Verify that the C extension is installed correctly.
+    """
+    from ccurl import Curl
+    print(dir(Curl))
+    #print(dir(ccurl))
+    Curl.local_pow()
+    print('XX')

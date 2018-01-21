@@ -22,7 +22,9 @@ setup(
   long_description = long_description,
 
   py_modules = ['pyota_ccurl'],
-  ext_modules = [Extension('ccurl', ['src/ccurlmodule.c'])],
+  ext_modules = [Extension('ccurl', ['src/ccurlmodule.c'],
+                           include_dirs=['/usr/include'],
+                           libraries=['ccurl'])],
 
   entry_points = {
     'console_scripts': [
