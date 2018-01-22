@@ -6,6 +6,7 @@ from unittest import TestCase
 
 from pyota_ccurl import is_installed
 from ccurl import Curl
+from iota import TryteString
 
 
 class IsInstalledTestCase(TestCase):
@@ -17,22 +18,17 @@ class IsInstalledTestCase(TestCase):
 
   def test_pow(self):
     """
-    Verify that the C extension is installed correctly.
-    """
-    print(dir(Curl))
-    #print(dir(ccurl))
-    # Curl.local_pow()
-    print('XX')
+    test pearl diver
 
-  def test_pearl_diver(self):
-    """
-    Verify that the C extension is installed correctly.
-    """
-    from ccurl import Curl
-    from iota import TryteString
+    #define TRYTE_LENGTH 2673
+    #define TRANSACTION_LENGTH TRYTE_LENGTH * 3
 
-    # "trits", "length", "min_weight_manitudes", "number_of_threads
-    # Curl().pearl_diver(trits=[111], length=1, min_weight_manitude=1, number_of_threads=1)
-    c = Curl()
-    trits = TryteString.from_string('TEST')
-    c.pearl_diver([trits], 1, 1, 1)
+    Values from test_pearl_diver_search in c tests
+    """
+    tryte_length = 2673
+    transaction_length = tryte_length * 3
+    nonce_size = 13
+
+    s = TryteString.from_string('Test')
+    trits = s.as_trits()
+    Curl().pearl_diver(trits, transaction_length, nonce_size, 8)

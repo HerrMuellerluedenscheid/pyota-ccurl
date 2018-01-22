@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <ccurl/ccurl.h>
 #include <ccurl/pearl_diver.h>
+#include <ccurl/util/converter.h>  // should become extra module
 // #include "/usr/include/ccurl/ccurl.h"
 
 #define HASH_LENGTH 243
@@ -131,29 +132,19 @@ Curl_absorb(Curl *self, PyObject *args, PyObject *kwds)
 }
 
 static PyObject*
-Curl_pow(PyObject *args, PyObject **kwds){
-  ccurl_pow_init();
-  // ccurl_pow(trytes, minWeightMagnitude);
-  ccurl_pow_finalize();
-  return Py_None;
-}
-
-static PyObject*
 Curl_pearl_diver(Curl *self, PyObject *args, PyObject **kwds){
   int length, number_of_threads, min_weight_magnitude;
   PyObject *incoming;
-  PearlDiver* pearl_diver;
+  PearlDiver ctx;
+  trit_t* trits;
+  // static char *kwlist[] = {"trits", "length", "min_weight_magnitude", "number_of_threads", NULL};
 
-  static char *kwlist[] = {"trits", "length", "min_weight_magnitude", "number_of_threads", NULL};
-
-    // Extract and validate parameters.
   if (! PyArg_ParseTuple(args, "Oiii", &incoming, &length, &number_of_threads, &min_weight_magnitude)){
-  // if (! PyArg_ParseTupleAndKeywords(args, kwds, "Oiii", kwlist, &incoming, &length, &min_weight_manitude, &number_of_threads)){
+  // if (! PyArg_ParseTupleAndKeywords(args, kwds, "Oiii", kwlist, &incoming, &length, &number_of_threads, &min_weight_manitude)){
     printf("something went wrong\n");
     return NULL;
   }
 
-  // Segmentation faulty
   if (! PyList_Check(incoming)) {
     PyErr_SetString(PyExc_TypeError, "`trits` argument must be a list.");
     return NULL;
@@ -161,10 +152,8 @@ Curl_pearl_diver(Curl *self, PyObject *args, PyObject **kwds){
 
   // ctx: PearlDiver struct (see: https://github.com/iotaledger/ccurl/blob/5bd644a8b5a2e7827115c2e43bf2eb8032f7935a/src/lib/pearl_diver.h)
   // thus, something like:
-  // /pd_search(&ctx, transactionTrits, length, min_weight_magnitude, number_of_threads);
   // testing: https://github.com/iotaledger/ccurl/blob/d6995a70255b6c225e2ba4506c78d4d13876cfc0/test/test_pearldiver.c
-  // pd_search(&pearl_diver, &incoming, length, min_weight_magnitude, number_of_threads);
-  // Py_INCREF(Py_None);
+  pd_search(&ctx, incoming, min_weight_magnitude, number_of_threads);
 
   return Py_None;
 }
@@ -227,8 +216,9 @@ static PyMethodDef Curl_methods[] = {
   {"reset", (PyCFunction)Curl_reset, METH_NOARGS, "Resets internal state."},
   {"squeeze", (PyCFunction)Curl_squeeze, METH_VARARGS|METH_KEYWORDS, "Squeeze trits from the sponge."},
   {"local_pow", (PyCFunction)Curl_pow, METH_NOARGS, "XXX."},
-  // {"pearl_diver", (PyCFunction)Curl_pearl_diver, METH_VARARGS|METH_KEYWORDS, "XXX."},
-  {"pearl_diver", (PyCFunction)Curl_pearl_diver, METH_VARARGS, "XXX."},
+  {"pearl_diver", (PyCFunction)Curl_pearl_diver, METH_VARARGS|METH_KEYWORDS, "XXX."},
+  // {"pearl_diver", (PyCFunction)Curl_pearl_diver, METH_VARARGS, "XXX."},
+  // {"curl_trits_from_trytes", (PyCFunction)Curl_tr, METH_VARARGS, "XXX."},
   {"dummy", (PyCFunction)dummy, METH_VARARGS|METH_KEYWORDS, "XXX."},
   {NULL} /* Sentinel */
 };
